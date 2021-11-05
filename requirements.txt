@@ -1,0 +1,6 @@
+backoff==1.11.1
+certifi==2021.10.8
+cloudinary==1.26.0
+ratelimit==2.2.1
+six==1.16.0
+urllib3==1.26.7
