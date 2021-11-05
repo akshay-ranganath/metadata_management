@@ -28,7 +28,7 @@ MAX_CALLS_PER_MINUTE = 83
 @limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 @sleep_and_retry
 @limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
-def list_resources(report_file, next_cursor=None):    
+def list_resources(folder, report_file, next_cursor=None):    
     '''
         Function that makes the Admin API Resource call (https://cloudinary.com/documentation/admin_api#get_resources)
         Fetches a max of 500 resources in one operation
@@ -47,14 +47,26 @@ def list_resources(report_file, next_cursor=None):
             while(1):                                            
 
                 # make an Admin API call to get the list of resources
-                resp = cloudinary.api.resources(
-                    type = TYPE,
-                    resource_type = RESOURCE_TYPE,
-                    max_results = 500,
-                    context=True,
-                    metadata=True,
-                    next_cursor = next_cursor                    
-                )
+                if folder==None:
+                    resp = cloudinary.api.resources(
+                        type = TYPE,
+                        resource_type = RESOURCE_TYPE,
+                        max_results = 500,
+                        context=True,
+                        metadata=True,
+                        next_cursor = next_cursor                    
+                    )
+                else:
+                    resp = cloudinary.api.resources(
+                        type = TYPE,
+                        resource_type = RESOURCE_TYPE,
+                        prefix = folder,
+                        max_results = 500,
+                        context=True,
+                        metadata=True,
+                        next_cursor = next_cursor                    
+                    )
+
                 
                 # loop and pull the public ids
                 for _ in resp['resources']:   
@@ -83,7 +95,11 @@ def list_resources(report_file, next_cursor=None):
 if __name__=="__main__":
 
     # Allow 2 optional parameters to set the log file and the report file names.
-    parser = argparse.ArgumentParser(description="Script to extract metadata and generate report ")
+    parser = argparse.ArgumentParser(
+        description="Script to extract metadata and generate report ",
+        usage="python3 generate_metadata.py --folder <<folder to analyze>> --log <<log file name>> --report <<report file name>>"
+    )
+
     parser.add_argument(
         '--report', 
         default="report.csv", 
@@ -95,6 +111,13 @@ if __name__=="__main__":
         default="log.csv", 
         required=False, 
         help="File name for report. default = \"report.csv\""
+    )
+    
+    parser.add_argument(
+        '--folder', 
+        default=None, 
+        required=False, 
+        help="Update metadata for objects in a fixed folder. Default=None (ie, process all objects in the account)"
     )
 
     args = parser.parse_args()
@@ -112,5 +135,5 @@ if __name__=="__main__":
 
     logging.info("Starting metadata extract...")
     logging.info("Report will be written in CSV format to a file named \"report.csv\"")
-    metadata_definitions = list_resources(args.report)
+    metadata_definitions = list_resources(args.folder, args.report)
     logging.info("Processing is now complete.")

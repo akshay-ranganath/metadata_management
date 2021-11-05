@@ -147,7 +147,10 @@ def list_resources(folder, next_cursor=None):
 
 if __name__=="__main__":
     # Allow 2 optional parameters to set the log file and the report file names.
-    parser = argparse.ArgumentParser(description="Script to parse file name and add metadata.")
+    parser = argparse.ArgumentParser(
+        description="Script to parse file name and add metadata.",
+        usage="python3 update_metadata.py --folder <<folder to analyze>> --log <<log file name>>"
+        )
     
     parser.add_argument(
         '--folder', 
