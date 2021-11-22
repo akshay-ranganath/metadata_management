@@ -14,7 +14,7 @@ import argparse
 RESOURCE_TYPE='image'
 #RESOURCE_TYPE='video'
 TYPE = 'upload'
-PATTERN = re.compile(r'^(?:.+/)(?:[a-zA-Z]{2,3})?(\d+)_([^\_]+)\_([^\_]+)')
+PATTERN = re.compile(r'^(?:.+/)?(?:[a-zA-Z]{2,3})?(\d+)_([^\_]+)\_([^\_]+)')
 POSITION = {
         'a': 1,
         'b': 2,
