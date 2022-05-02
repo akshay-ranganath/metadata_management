@@ -111,6 +111,7 @@ def list_resources(folder, next_cursor=None):
     with PoolExecutor(max_workers=50) as executor:
         while(1):
             resources = []
+            resources_in_loop = 0
             try:
                 # make an Admin API call to get the list of resources across all folders
                 if folder==None:
@@ -131,10 +132,13 @@ def list_resources(folder, next_cursor=None):
                     )
                 
                 # loop and pull the public ids
-                for _ in resp['resources']:            
-                    resources.append(_['public_id'])
+                for _ in resp['resources']: 
+                    # ensure this is not a soft-deleted resource
+                    if _['bytes'] > 0:
+                        resources.append(_['public_id'])
+                        resources_in_loop+= 1
                 
-                total_resources += len(resp['resources'])
+                total_resources += resources_in_loop
                 # now update the metadata for these resources
                 for _ in executor.map(update_metadata, resources):
                     pass
