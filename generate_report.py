@@ -45,7 +45,7 @@ def list_resources(folder, report_file, next_cursor=None):
         
         with PoolExecutor(max_workers=50) as executor:
             while(1):                                            
-
+                resources_in_loop = 0
                 # make an Admin API call to get the list of resources
                 if folder==None:
                     resp = cloudinary.api.resources(
@@ -70,20 +70,23 @@ def list_resources(folder, report_file, next_cursor=None):
                 
                 # loop and pull the public ids
                 for _ in resp['resources']:   
-                    row_data = []         
-                    row_data.append(_['public_id'])
-                    logging.debug(_['public_id'])
-                    row_data.append(_['type'])
-                    row_data.append(_['resource_type'])
-                    
-                    if 'metadata' in _:
-                        metadata = _['metadata']
-                        row_data.append(metadata['color_code'] if 'color_code' in metadata else '')
-                        row_data.append(metadata['display_position'] if 'display_position' in metadata else '')
-                        row_data.append(metadata['product_id'] if 'product_id' in metadata else '')
-                        writer.writerow(row_data)
+                    if _['bytes'] > 0:
+                        row_data = []         
+                        row_data.append(_['public_id'])
+                        logging.debug(_['public_id'])
+                        row_data.append(_['type'])
+                        row_data.append(_['resource_type'])
+                        
+                        if 'metadata' in _:
+                            metadata = _['metadata']
+                            row_data.append(metadata['color_code'] if 'color_code' in metadata else '')
+                            row_data.append(metadata['display_position'] if 'display_position' in metadata else '')
+                            row_data.append(metadata['product_id'] if 'product_id' in metadata else '')
+                            writer.writerow(row_data)
+                        
+                        resources_in_loop += 1
                 
-                total_resources += len(resp['resources'])    
+                total_resources += resources_in_loop    
                 logging.info(f'Processed {total_resources} resources')                
 
                 # finally check if we have more resources - if so, use pagination
