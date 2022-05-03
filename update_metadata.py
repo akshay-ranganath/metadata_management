@@ -134,7 +134,7 @@ def list_resources(folder, next_cursor=None):
                 # loop and pull the public ids
                 for _ in resp['resources']: 
                     # ensure this is not a soft-deleted resource
-                    if _['bytes'] > 0:
+                    if _['bytes'] > 0 and 'placeholder' in _ and _['placeholder']==True:
                         resources.append(_['public_id'])
                         resources_in_loop+= 1
                 

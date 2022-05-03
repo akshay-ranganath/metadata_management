@@ -70,7 +70,7 @@ def list_resources(folder, report_file, next_cursor=None):
                 
                 # loop and pull the public ids
                 for _ in resp['resources']:   
-                    if _['bytes'] > 0:
+                    if _['bytes'] > 0 and 'placeholder' in _ and _['placeholder']==True:
                         row_data = []         
                         row_data.append(_['public_id'])
                         logging.debug(_['public_id'])
